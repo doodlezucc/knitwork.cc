@@ -6,7 +6,7 @@ Source Command: npx @threlte/gltf@3.0.1 ./static/models/EeyoreCD.glb --root /mod
 	import type * as THREE from 'three';
 
 	import { T, type Props } from '@threlte/core';
-	import { useGltf } from '@threlte/extras';
+	import { useDraco, useGltf } from '@threlte/extras';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -39,7 +39,8 @@ Source Command: npx @threlte/gltf@3.0.1 ./static/models/EeyoreCD.glb --root /mod
 		};
 	};
 
-	const gltf = useGltf<GLTFResult>('/models/EeyoreCD.glb');
+	const dracoLoader = useDraco();
+	const gltf = useGltf<GLTFResult>('/models/EeyoreCD.glb', { dracoLoader });
 
 	gltf.then(() => onLoaded());
 </script>
