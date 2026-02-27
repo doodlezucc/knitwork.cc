@@ -1,0 +1,31 @@
+@use './typography.scss';
+@use './scheme.scss';
+
+body {
+	@include typography.body();
+	@include scheme.text-default();
+
+	background-color: scheme.$background;
+
+	min-height: 100vh;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	@include typography.heading();
+	margin: 0;
+}
+
+a {
+	@include scheme.text-highlight();
+}
+
+em {
+	font-style: normal;
+	@include scheme.text-highlight();
+}

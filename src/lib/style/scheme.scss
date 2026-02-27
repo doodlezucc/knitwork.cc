@@ -1,0 +1,13 @@
+$primary: #ff0073;
+$foreground: #000000;
+$background: #ffffff;
+
+@mixin text-default() {
+	color: $foreground;
+	font-weight: normal;
+}
+
+@mixin text-highlight() {
+	color: $primary;
+	font-weight: bold;
+}
