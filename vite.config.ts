@@ -4,7 +4,13 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	plugins: [sveltekit()],
 	optimizeDeps: {
-		include: ['@threlte/core', '@threlte/extras', '@threlte/rapier', 'three']
+		include: [
+			'@dimforge/rapier3d-compat',
+			'@threlte/core',
+			'@threlte/extras',
+			'@threlte/rapier',
+			'three'
+		]
 	},
 	test: {
 		expect: { requireAssertions: true },
