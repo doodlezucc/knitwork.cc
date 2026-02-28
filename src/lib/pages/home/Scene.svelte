@@ -1,41 +1,39 @@
 <script lang="ts">
 	import EeyoreCD from '$lib/assets/gltf/EeyoreCD.svelte';
-	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
 	import { T, useTask } from '@threlte/core';
 	import { interactivity, MeshLineGeometry, MeshLineMaterial, useCursor } from '@threlte/extras';
 	import { Collider, RigidBody, usePhysicsTask, useRapier, useRopeJoint } from '@threlte/rapier';
 	import { cubicOut } from 'svelte/easing';
-	import { Tween } from 'svelte/motion';
 	import { Vector3 } from 'three';
 	import SceneEnvironment from './SceneEnvironment.svelte';
 
 	interactivity();
 
-	let suspensionT = new Tween(0, { duration: 7000, easing: cubicOut });
-	let podiumT = new Tween(0, { delay: 500, duration: 2000, easing: cubicOut });
+	const suspensionDurationSeconds = 7;
+	const suspensionEasing = cubicOut;
 
-	let anchor = $derived.by(() => {
-		const t = suspensionT.current;
-		return new Vector3(0.05, 8, 0.05).lerp({ x: 0, y: 5.3, z: 0 }, t);
-	});
-	let podiumPosition = $derived.by(() => {
-		const t = podiumT.current;
-		return new Vector3(0, -5, 0).lerp({ x: 0, y: -0.525, z: 0 }, t);
+	let isSuspending = $state(false);
+	let suspensionT = $state(0);
+	let anchorPosition = $derived.by(() => {
+		const t = suspensionEasing(suspensionT);
+		return new Vector3(0.05, 7.5, 0.05).lerp({ x: 0, y: 5.3, z: 0 }, t);
 	});
 
 	const { rigidBodyA, rigidBodyB } = useRopeJoint([0, 0, 0], [0, 0, 0], 4);
 
-	let podiumBody = $state<RapierRigidBody>();
-	let ropePointA = $state.raw([new Vector3()]);
+	let ropePointA = $state.raw([new Vector3(0, 8, 0)]);
 
 	const { simulationTask } = useRapier();
 
-	usePhysicsTask(() => {
-		if ($rigidBodyB && podiumBody) {
-			$rigidBodyB.setNextKinematicTranslation(anchor);
-			podiumBody.setNextKinematicTranslation(podiumPosition);
-		}
-	});
+	usePhysicsTask(
+		(delta) => {
+			if (isSuspending && $rigidBodyB) {
+				suspensionT = Math.min(1.0, suspensionT + delta / suspensionDurationSeconds);
+				$rigidBodyB.setNextKinematicTranslation(anchorPosition);
+			}
+		},
+		{ running: () => suspensionT <= 1 }
+	);
 
 	useTask(
 		() => {
@@ -48,8 +46,7 @@
 	);
 
 	function startSuspension() {
-		suspensionT.target = 1;
-		podiumT.target = 1;
+		isSuspending = true;
 	}
 
 	const { onPointerEnter, onPointerLeave } = useCursor();
@@ -57,28 +54,11 @@
 
 <T.PerspectiveCamera makeDefault position={[0, 1, 5]} rotation={[0, 0, 0]} fov={20} />
 
-<!-- <RigidBody type="fixed">
-	<T.Mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-		<T.PlaneGeometry args={[10, 10]} />
-		<T.MeshPhysicalMaterial color="hotpink" metalness={0.05} roughness={0.5} />
-	</T.Mesh>
-</RigidBody> -->
-
-<T.Group position={[0, -0.5, 0]}>
-	<RigidBody type="kinematicPosition" bind:rigidBody={podiumBody}>
-		<Collider shape="cylinder" args={[1, 0.5]} />
-		<T.Mesh receiveShadow>
-			<T.CylinderGeometry args={[0.5, 0.5, 2]} />
-			<T.MeshPhysicalMaterial color="#df629a" metalness={0.05} roughness={0.5} />
-		</T.Mesh>
-	</RigidBody>
-</T.Group>
-
 <RigidBody
 	bind:rigidBody={$rigidBodyB}
 	type="kinematicPosition"
 	oncreate={(ref) => {
-		ref.setTranslation(anchor, false);
+		ref.setTranslation(anchorPosition, false);
 	}}
 />
 
@@ -100,7 +80,7 @@
 </T.Group>
 
 <T.Mesh>
-	<MeshLineGeometry points={[anchor, ropePointA[0]]} />
+	<MeshLineGeometry points={[anchorPosition, ropePointA[0]]} />
 	<MeshLineMaterial width={0.015} color="#000000" opacity={0.25} dashRatio={0.5} dashArray={0.01} />
 </T.Mesh>
 
