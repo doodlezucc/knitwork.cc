@@ -17,7 +17,7 @@
 </section>
 
 <div class="canvas">
-	<Canvas toneMapping={NeutralToneMapping} shadows={PCFShadowMap} renderMode="always">
+	<Canvas toneMapping={NeutralToneMapping} shadows={PCFShadowMap}>
 		<World>
 			<Scene />
 		</World>
@@ -33,8 +33,7 @@
 	.content {
 		padding: 96px 24px;
 		padding-bottom: 0;
-		width: min(max(calc(25vw + 200px), 640px), calc(100vw - 36px));
-		position: relative;
+		width: min(max(calc(25vw + 200px), 640px), 100vw);
 		z-index: 1;
 	}
 
@@ -48,7 +47,7 @@
 		position: fixed;
 		top: 0;
 		left: 0;
-		bottom: 0;
-		right: 0;
+		width: 100vw;
+		height: 100svh;
 	}
 </style>

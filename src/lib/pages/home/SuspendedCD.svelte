@@ -22,7 +22,7 @@
 		type Intersection
 	} from 'three';
 
-	const suspensionDurationSeconds = 7;
+	const suspensionDurationSeconds = 5;
 	const suspensionEasing = cubicOut;
 
 	const { rigidBodyA: bodyCD, rigidBodyB: bodyHook } = useRopeJoint([0, 0, 0], [0, 0, 0], 4);
@@ -98,13 +98,14 @@
 	}
 
 	interface GrabbingState {
+		/** The initiating touch's unique ID. */
+		pointerId: number;
+		zCoordinate: number;
 		joint: ImpulseJoint;
-		z: number;
-		offset: Vector3;
 	}
 
 	let grabbingState = $state<GrabbingState>();
-	const bodyCursor = writable<RapierRigidBody>();
+	const bodyCursor = writable<RapierRigidBody | undefined>();
 
 	let cdHitbox: Object3D | undefined;
 	const pointerPosition = new Vector2();
@@ -126,7 +127,7 @@
 		return new Quaternion(q.x, q.y, q.z, q.w);
 	}
 
-	function startGrabbing(intersection: Intersection) {
+	function startGrabbing(intersection: Intersection, pointerId: number) {
 		disposeGrabbingState();
 
 		if (!$bodyCD || !$bodyCursor) return;
@@ -154,9 +155,9 @@
 		);
 
 		grabbingState = {
-			joint: joint,
-			z: grabbedPoint.z,
-			offset: grabbedPointRelativeToCD
+			pointerId,
+			zCoordinate: grabbedPoint.z,
+			joint
 		};
 	}
 
@@ -189,38 +190,27 @@
 
 		if (cdIntersection) {
 			ev.preventDefault();
-			startGrabbing(cdIntersection);
+
+			if (!grabbingState) {
+				startGrabbing(cdIntersection, ev.pointerId);
+			}
 		}
 	}
 
 	function onPointerMove(ev: PointerEvent) {
 		handlePointerPositionUpdate(ev);
 
-		if (isHovered) {
-			ev.preventDefault();
+		if (grabbingState && ev.pointerId === grabbingState.pointerId) {
+			const grabbedPoint = raycastPlaneXY(grabbingState.zCoordinate);
+			$bodyCursor!.setNextKinematicTranslation(grabbedPoint);
 		}
-
-		updateGrabbing();
 	}
 
-	function updateGrabbing() {
-		if (!grabbingState || !$bodyCursor) return;
-
-		const grabbedPoint = raycastPlaneXY(grabbingState.z);
-		$bodyCursor.setNextKinematicTranslation(grabbedPoint);
+	function onPointerUp(ev: PointerEvent) {
+		if (grabbingState && ev.pointerId === grabbingState.pointerId) {
+			disposeGrabbingState();
+		}
 	}
-
-	const rope2Points = [new Vector3(), new Vector3()];
-
-	useTask(
-		() => {
-			if ($bodyCD && $bodyCursor && grabbingState) {
-				rope2Points[0].copy(grabbingState.offset.clone().add($bodyCursor.translation()));
-				rope2Points[1].copy($bodyCD.translation());
-			}
-		},
-		{ after: simulationTask }
-	);
 
 	onMount(() => {
 		document.addEventListener('touchstart', onTouchStart, { passive: false });
@@ -232,9 +222,9 @@
 </script>
 
 <svelte:window
-	onpointerup={disposeGrabbingState}
 	onpointerdown={onPointerDown}
 	onpointermove={onPointerMove}
+	onpointerup={onPointerUp}
 />
 
 <RigidBody
@@ -267,10 +257,5 @@
 
 <T.Mesh>
 	<MeshLineGeometry points={ropeEndpoints} />
-	<MeshLineMaterial width={0.015} color="#000000" opacity={0.25} dashRatio={0.5} dashArray={0.01} />
-</T.Mesh>
-
-<T.Mesh>
-	<MeshLineGeometry points={rope2Points} />
 	<MeshLineMaterial width={0.015} color="#000000" opacity={0.25} dashRatio={0.5} dashArray={0.01} />
 </T.Mesh>
