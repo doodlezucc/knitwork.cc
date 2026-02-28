@@ -8,6 +8,7 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { MeshLineGeometry, MeshLineMaterial, useCursor } from '@threlte/extras';
 	import { Collider, RigidBody, useRapier, useRopeJoint } from '@threlte/rapier';
+	import { onMount } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
 	import { writable } from 'svelte/store';
 	import {
@@ -21,7 +22,7 @@
 		type Intersection
 	} from 'three';
 
-	const suspensionDurationSeconds = 1;
+	const suspensionDurationSeconds = 7;
 	const suspensionEasing = cubicOut;
 
 	const { rigidBodyA: bodyCD, rigidBodyB: bodyHook } = useRopeJoint([0, 0, 0], [0, 0, 0], 4);
@@ -51,6 +52,8 @@
 		{ before: simulationTask, running: () => suspensionProgress <= 1 }
 	);
 
+	let isHovered = $state(false);
+
 	// Runs after physics simulation stage
 	useTask(
 		() => {
@@ -59,7 +62,7 @@
 				ropeEndpoints = [hookPosition, cdAnchorPosition];
 
 				const cdIntersection = intersectCD();
-				setCDHovered(cdIntersection !== undefined);
+				isHovered = cdIntersection !== undefined;
 			}
 		},
 		{ after: simulationTask }
@@ -70,8 +73,16 @@
 	}
 
 	const { onPointerEnter, onPointerLeave } = useCursor();
-	const { camera } = useThrelte();
 
+	$effect(() => {
+		if (isHovered) {
+			onPointerEnter();
+		} else {
+			onPointerLeave();
+		}
+	});
+
+	const { camera } = useThrelte();
 	const raycaster = new Raycaster();
 
 	function updateRaycaster() {
@@ -149,21 +160,26 @@
 		};
 	}
 
-	function setCDHovered(hovered: boolean) {
-		if (hovered) {
-			onPointerEnter();
-		} else {
-			onPointerLeave();
-		}
+	interface HasClientPosition {
+		clientX: number;
+		clientY: number;
 	}
 
-	function handlePointerPositionUpdate(ev: PointerEvent) {
+	function handlePointerPositionUpdate({ clientX, clientY }: HasClientPosition) {
 		pointerPosition.set(
-			(ev.clientX / window.innerWidth) * 2 - 1,
-			-(ev.clientY / window.innerHeight) * 2 + 1
+			(clientX / window.innerWidth) * 2 - 1,
+			-(clientY / window.innerHeight) * 2 + 1
 		);
 
 		updateRaycaster();
+	}
+
+	function onTouchStart(ev: TouchEvent) {
+		handlePointerPositionUpdate(ev.touches[0]);
+
+		if (intersectCD()) {
+			ev.preventDefault();
+		}
 	}
 
 	function onPointerDown(ev: PointerEvent) {
@@ -172,12 +188,17 @@
 		const cdIntersection = intersectCD();
 
 		if (cdIntersection) {
+			ev.preventDefault();
 			startGrabbing(cdIntersection);
 		}
 	}
 
 	function onPointerMove(ev: PointerEvent) {
 		handlePointerPositionUpdate(ev);
+
+		if (isHovered) {
+			ev.preventDefault();
+		}
 
 		updateGrabbing();
 	}
@@ -200,6 +221,14 @@
 		},
 		{ after: simulationTask }
 	);
+
+	onMount(() => {
+		document.addEventListener('touchstart', onTouchStart, { passive: false });
+
+		return () => {
+			document.removeEventListener('touchstart', onTouchStart);
+		};
+	});
 </script>
 
 <svelte:window
