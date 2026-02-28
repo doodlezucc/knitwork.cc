@@ -46,6 +46,7 @@ Source Command: npx @threlte/gltf@3.0.1 ./static/models/EeyoreCD.glb --root /mod
 </script>
 
 <T.Group bind:ref dispose={false} {...props}>
+	<!-- eslint-disable-next-line svelte/require-store-reactive-access -->
 	{#await gltf}
 		{@render fallback?.()}
 	{:then gltf}
