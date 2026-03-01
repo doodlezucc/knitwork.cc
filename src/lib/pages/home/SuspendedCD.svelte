@@ -11,19 +11,14 @@
 	import { onMount } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
 	import { writable } from 'svelte/store';
-	import {
-		Matrix4,
-		Object3D,
-		Plane,
-		Quaternion,
-		Raycaster,
-		Vector2,
-		Vector3,
-		type Intersection
-	} from 'three';
+	import { Matrix4, Object3D, Plane, Quaternion, Raycaster, Vector2, Vector3 } from 'three';
 
 	const suspensionDurationSeconds = 5;
 	const suspensionEasing = cubicOut;
+
+	const grabMaxDelayMs = 40;
+	const clickMaxDelayMs = 150;
+	const tapImpulse = 0.08;
 
 	const { rigidBodyA: bodyCD, rigidBodyB: bodyHook } = useRopeJoint([0, 0, 0], [0, 0, 0], 4);
 
@@ -127,10 +122,13 @@
 		return new Quaternion(q.x, q.y, q.z, q.w);
 	}
 
-	function startGrabbing(intersection: Intersection, pointerId: number) {
+	function startGrabbing(pointerId: number) {
 		disposeGrabbingState();
 
 		if (!$bodyCD || !$bodyCursor) return;
+
+		const intersection = intersectCD();
+		if (!intersection) return;
 
 		const grabbedPoint = intersection.point;
 
@@ -185,6 +183,10 @@
 
 	const { canvas } = useDOM();
 
+	let isClickEvent = false;
+	let delayedGrabbingTimeout: NodeJS.Timeout | undefined;
+	let clickCooldownTimeout: NodeJS.Timeout | undefined;
+
 	function onPointerDown(ev: PointerEvent) {
 		if (ev.target !== canvas) {
 			// Pointer event occurred outside the 3D scene
@@ -199,8 +201,13 @@
 
 		if (cdIntersection) {
 			ev.preventDefault();
+			isClickEvent = true;
 
-			startGrabbing(cdIntersection, ev.pointerId);
+			clearTimeout(delayedGrabbingTimeout);
+			delayedGrabbingTimeout = setTimeout(() => startGrabbing(ev.pointerId), grabMaxDelayMs);
+
+			clearTimeout(clickCooldownTimeout);
+			clickCooldownTimeout = setTimeout(() => (isClickEvent = false), clickMaxDelayMs);
 		}
 	}
 
@@ -208,6 +215,7 @@
 		handlePointerPositionUpdate(ev);
 
 		if (grabbingState && ev.pointerId === grabbingState.pointerId) {
+			isClickEvent = false;
 			const grabbedPoint = raycastPlaneXY(grabbingState.zCoordinate);
 			$bodyCursor!.setNextKinematicTranslation(grabbedPoint);
 		}
@@ -216,7 +224,18 @@
 	function onPointerUp(ev: PointerEvent) {
 		if (grabbingState && ev.pointerId === grabbingState.pointerId) {
 			disposeGrabbingState();
+
+			if (isClickEvent) {
+				applyImpulse();
+			}
 		}
+	}
+
+	function applyImpulse() {
+		const cdIntersection = intersectCD();
+		if (!cdIntersection || !$bodyCD) return;
+
+		$bodyCD.applyImpulseAtPoint(new Vector3(0, 0, -tapImpulse), cdIntersection.point, true);
 	}
 
 	onMount(() => {
