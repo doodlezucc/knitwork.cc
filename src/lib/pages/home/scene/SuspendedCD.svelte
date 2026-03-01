@@ -5,13 +5,14 @@
 		Quaternion as RapierQuaternion,
 		RigidBody as RapierRigidBody
 	} from '@dimforge/rapier3d-compat';
-	import { T, useDOM, useTask, useThrelte } from '@threlte/core';
+	import { T, useDOM, useTask } from '@threlte/core';
 	import { MeshLineGeometry, MeshLineMaterial, useCursor } from '@threlte/extras';
 	import { Collider, RigidBody, useRapier, useRopeJoint } from '@threlte/rapier';
 	import { onMount } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
 	import { writable } from 'svelte/store';
-	import { Matrix4, Object3D, Plane, Quaternion, Raycaster, Vector2, Vector3 } from 'three';
+	import { Matrix4, Object3D, Quaternion, Vector3 } from 'three';
+	import { useRaycasting } from './raycasting.svelte';
 
 	const suspensionDurationSeconds = 5;
 	const suspensionEasing = cubicOut;
@@ -77,20 +78,7 @@
 		}
 	});
 
-	const { camera } = useThrelte();
-	const raycaster = new Raycaster();
-
-	function updateRaycaster() {
-		raycaster.setFromCamera(pointerPosition, $camera);
-	}
-	const xyPlane = new Plane(new Vector3(0, 0, 1));
-	const target = new Vector3();
-
-	function raycastPlaneXY(z: number) {
-		xyPlane.constant = -z;
-		raycaster.ray.intersectPlane(xyPlane, target);
-		return target;
-	}
+	const raycaster = useRaycasting();
 
 	interface GrabbingState {
 		/** The initiating touch's unique ID. */
@@ -103,12 +91,11 @@
 	const bodyCursor = writable<RapierRigidBody | undefined>();
 
 	let cdHitbox: Object3D | undefined;
-	const pointerPosition = new Vector2();
 
 	function intersectCD() {
 		if (!cdHitbox) return undefined;
 
-		return raycaster.intersectObject(cdHitbox).at(0);
+		return raycaster.intersect(cdHitbox);
 	}
 
 	function disposeGrabbingState() {
@@ -159,22 +146,8 @@
 		};
 	}
 
-	interface HasClientPosition {
-		clientX: number;
-		clientY: number;
-	}
-
-	function handlePointerPositionUpdate({ clientX, clientY }: HasClientPosition) {
-		pointerPosition.set(
-			(clientX / window.innerWidth) * 2 - 1,
-			-(clientY / window.innerHeight) * 2 + 1
-		);
-
-		updateRaycaster();
-	}
-
 	function onTouchStart(ev: TouchEvent) {
-		handlePointerPositionUpdate(ev.touches[0]);
+		raycaster.handlePointerPositionUpdate(ev.touches[0]);
 
 		if (intersectCD()) {
 			ev.preventDefault();
@@ -195,7 +168,7 @@
 
 		if (grabbingState) return;
 
-		handlePointerPositionUpdate(ev);
+		raycaster.handlePointerPositionUpdate(ev);
 
 		const cdIntersection = intersectCD();
 
@@ -212,11 +185,11 @@
 	}
 
 	function onPointerMove(ev: PointerEvent) {
-		handlePointerPositionUpdate(ev);
+		raycaster.handlePointerPositionUpdate(ev);
 
 		if (grabbingState && ev.pointerId === grabbingState.pointerId) {
 			isClickEvent = false;
-			const grabbedPoint = raycastPlaneXY(grabbingState.zCoordinate);
+			const grabbedPoint = raycaster.raycastPlaneXY(grabbingState.zCoordinate);
 			$bodyCursor!.setNextKinematicTranslation(grabbedPoint);
 		}
 	}
