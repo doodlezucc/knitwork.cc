@@ -3,18 +3,21 @@
 	import { World } from '@threlte/rapier';
 	import { NeutralToneMapping, PCFShadowMap } from 'three';
 	import Scene from './Scene.svelte';
+	import HUD from './hud/HUD.svelte';
 </script>
 
 <section>
 	<div class="content">
 		<h1>Knitwork</h1>
-		<p>Music and stuff.</p>
-		<p>My <em>Eeyore EP</em> releases on March 1st, 2026.</p>
+		<p>Hello! I make music and stuff.</p>
+		<p>The <em>Eeyore EP</em> is out now, check it out if you like.</p>
 		<p>
 			Also check out <a href="https://theoretically.online/">theoretically.online</a> for handmade development.
 		</p>
 	</div>
 </section>
+
+<HUD />
 
 <div class="canvas">
 	<Canvas toneMapping={NeutralToneMapping} shadows={PCFShadowMap}>

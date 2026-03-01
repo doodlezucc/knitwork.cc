@@ -32,7 +32,7 @@
 
 	let hookPosition = $derived.by(() => {
 		const t = suspensionEasing(suspensionProgress);
-		return new Vector3(0.05, 7.5, 0.05).lerp({ x: 0, y: 5.3, z: 0 }, t);
+		return new Vector3(0.05, 7.5, 0.05).lerp({ x: 0, y: 5.25, z: 0 }, t);
 	});
 
 	const cdAnchorPosition = new Vector3(0, 10, 0);
