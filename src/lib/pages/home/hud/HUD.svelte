@@ -18,7 +18,13 @@
 
 		display: grid;
 		place-content: center;
-		grid-template-columns: max-content max-content;
+		// grid-template-columns: max-content max-content;
 		gap: 24px;
+	}
+
+	@media screen and (max-width: 640px) {
+		.hud {
+			bottom: 20px;
+		}
 	}
 </style>

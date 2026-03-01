@@ -31,7 +31,7 @@
 		background-color: var(--background);
 		color: var(--foreground);
 		box-shadow: 0 2px 4px #00000030;
-		padding: 16px 36px;
+		padding: 16px 32px;
 
 		&:hover {
 			background-color: oklch(from var(--background) calc(l + 0.25) c h);

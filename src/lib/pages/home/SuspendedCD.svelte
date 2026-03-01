@@ -5,7 +5,7 @@
 		Quaternion as RapierQuaternion,
 		RigidBody as RapierRigidBody
 	} from '@dimforge/rapier3d-compat';
-	import { T, useTask, useThrelte } from '@threlte/core';
+	import { T, useDOM, useTask, useThrelte } from '@threlte/core';
 	import { MeshLineGeometry, MeshLineMaterial, useCursor } from '@threlte/extras';
 	import { Collider, RigidBody, useRapier, useRopeJoint } from '@threlte/rapier';
 	import { onMount } from 'svelte';
@@ -183,7 +183,16 @@
 		}
 	}
 
+	const { canvas } = useDOM();
+
 	function onPointerDown(ev: PointerEvent) {
+		if (ev.target !== canvas) {
+			// Pointer event occurred outside the 3D scene
+			return;
+		}
+
+		if (grabbingState) return;
+
 		handlePointerPositionUpdate(ev);
 
 		const cdIntersection = intersectCD();
@@ -191,9 +200,7 @@
 		if (cdIntersection) {
 			ev.preventDefault();
 
-			if (!grabbingState) {
-				startGrabbing(cdIntersection, ev.pointerId);
-			}
+			startGrabbing(cdIntersection, ev.pointerId);
 		}
 	}
 
