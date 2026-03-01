@@ -2,8 +2,8 @@
 	import { Canvas } from '@threlte/core';
 	import { World } from '@threlte/rapier';
 	import { NeutralToneMapping, PCFShadowMap } from 'three';
-	import Scene from './Scene.svelte';
 	import HUD from './hud/HUD.svelte';
+	import Scene from './scene/Scene.svelte';
 </script>
 
 <section>
