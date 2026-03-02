@@ -15,6 +15,7 @@ Source Command: npx @threlte/gltf@3.0.1 ./static/models/EeyoreCD.glb --root /mod
 		children,
 		ref = $bindable(),
 		onLoaded,
+		hullMaterial,
 		...props
 	}: Props<THREE.Group> & {
 		ref?: THREE.Group;
@@ -22,6 +23,7 @@ Source Command: npx @threlte/gltf@3.0.1 ./static/models/EeyoreCD.glb --root /mod
 		fallback?: Snippet;
 		error?: Snippet<[{ error: Error }]>;
 		onLoaded: () => void;
+		hullMaterial: Snippet;
 	} = $props();
 
 	type GLTFResult = {
@@ -30,6 +32,7 @@ Source Command: npx @threlte/gltf@3.0.1 ./static/models/EeyoreCD.glb --root /mod
 			Cube_1: THREE.Mesh;
 			Cube_2: THREE.Mesh;
 			Cube_3: THREE.Mesh;
+			Eeyore_CD_Hull: THREE.Mesh;
 		};
 		materials: {
 			Solid: THREE.MeshStandardMaterial;
@@ -50,10 +53,13 @@ Source Command: npx @threlte/gltf@3.0.1 ./static/models/EeyoreCD.glb --root /mod
 	{#await gltf}
 		{@render fallback?.()}
 	{:then gltf}
-		<T.Mesh castShadow geometry={gltf.nodes.Cube.geometry} material={gltf.materials.Solid} />
-		<T.Mesh castShadow geometry={gltf.nodes.Cube_1.geometry} material={gltf.materials.Plastic} />
+		<T.Mesh geometry={gltf.nodes.Cube.geometry} material={gltf.materials.Solid} />
+		<T.Mesh geometry={gltf.nodes.Cube_1.geometry} material={gltf.materials.Plastic} />
 		<T.Mesh geometry={gltf.nodes.Cube_2.geometry} material={gltf.materials['Cover Art']} />
 		<T.Mesh geometry={gltf.nodes.Cube_3.geometry} material={gltf.materials.CD} />
+		<T.Mesh castShadow geometry={gltf.nodes.Eeyore_CD_Hull.geometry} renderOrder={1}>
+			{@render hullMaterial()}
+		</T.Mesh>
 	{:catch err}
 		{@render error?.({ error: err })}
 	{/await}

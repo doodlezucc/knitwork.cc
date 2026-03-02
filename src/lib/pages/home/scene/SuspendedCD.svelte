@@ -6,12 +6,13 @@
 		RigidBody as RapierRigidBody
 	} from '@dimforge/rapier3d-compat';
 	import { T, useDOM, useTask } from '@threlte/core';
-	import { MeshLineGeometry, MeshLineMaterial, useCursor } from '@threlte/extras';
+	import { MeshLineGeometry, MeshLineMaterial } from '@threlte/extras';
 	import { Collider, RigidBody, useRapier, useRopeJoint } from '@threlte/rapier';
 	import { onMount } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
 	import { writable } from 'svelte/store';
-	import { Matrix4, Object3D, Quaternion, Vector3 } from 'three';
+	import { Group, Matrix4, Mesh, Quaternion, Vector3 } from 'three';
+	import ProximityShaderMaterial from './proximity-shader/ProximityShaderMaterial.svelte';
 	import { useRaycasting } from './raycasting.svelte';
 
 	const suspensionDurationSeconds = 5;
@@ -44,6 +45,7 @@
 		{ before: simulationTask, running: () => suspensionProgress <= 1 }
 	);
 
+	let cdModel = $state<Group>();
 	let isHovered = $state(false);
 
 	// Runs after physics simulation stage
@@ -64,14 +66,18 @@
 		isSuspending = true;
 	}
 
-	const { onPointerEnter, onPointerLeave } = useCursor();
+	let cursor = $derived.by(() => {
+		if (grabbingState) {
+			return 'grabbing';
+		} else if (isHovered) {
+			return 'grab';
+		} else {
+			return 'auto';
+		}
+	});
 
 	$effect(() => {
-		if (isHovered) {
-			onPointerEnter();
-		} else {
-			onPointerLeave();
-		}
+		document.body.style.cursor = cursor;
 	});
 
 	const raycaster = useRaycasting();
@@ -81,12 +87,13 @@
 		pointerId: number;
 		zCoordinate: number;
 		joint: ImpulseJoint;
+		anchorRelativeToCDModel: Vector3;
 	}
 
 	let grabbingState = $state<GrabbingState>();
 	const bodyCursor = writable<RapierRigidBody | undefined>();
 
-	let cdHitbox: Object3D | undefined;
+	let cdHitbox = $state<Mesh>();
 
 	function computeCDIntersection() {
 		if (!cdHitbox) return undefined;
@@ -108,7 +115,7 @@
 	function startGrabbing(pointerId: number) {
 		disposeGrabbingState();
 
-		if (!$bodyCD || !$bodyCursor) return;
+		if (!$bodyCD || !$bodyCursor || !cdModel) return;
 
 		const intersection = computeCDIntersection();
 		if (!intersection) return;
@@ -127,6 +134,7 @@
 			.multiply(translation);
 
 		const grabbedPointRelativeToCD = grabbedPoint.clone().applyMatrix4(localSpaceMatrix);
+		const anchorRelativeToCDModel = cdModel.worldToLocal(grabbedPoint.clone());
 
 		const joint = world.createImpulseJoint(
 			rapier.JointData.spring(0, 2, 1, { x: 0, y: 0, z: 0 }, grabbedPointRelativeToCD),
@@ -138,7 +146,8 @@
 		grabbingState = {
 			pointerId,
 			zCoordinate: grabbedPoint.z,
-			joint
+			joint,
+			anchorRelativeToCDModel
 		};
 	}
 
@@ -201,6 +210,8 @@
 	onpointerup={onPointerUp}
 />
 
+<svelte:body style:cursor />
+
 <RigidBody
 	bind:rigidBody={$bodyHook}
 	type="kinematicPosition"
@@ -215,14 +226,13 @@
 	<RigidBody bind:rigidBody={$bodyCD} linearDamping={0.1} angularDamping={0.5} canSleep={false}>
 		<T.Group position={[0, -0.417, 0]} rotation={[Math.PI / 2, 0, 0]}>
 			<Collider shape="cuboid" args={[0.5, 0.04, 0.417]} />
-			<EeyoreCD onLoaded={startSuspension} />
+			<EeyoreCD onLoaded={startSuspension} bind:ref={cdModel}>
+				{#snippet hullMaterial()}
+					<ProximityShaderMaterial target={grabbingState?.anchorRelativeToCDModel} />
+				{/snippet}
+			</EeyoreCD>
 
-			<T.Mesh
-				visible={false}
-				oncreate={(ref) => {
-					cdHitbox = ref;
-				}}
-			>
+			<T.Mesh visible={false} bind:ref={cdHitbox}>
 				<T.BoxGeometry args={[1, 0.08, 0.834]} />
 			</T.Mesh>
 		</T.Group>
