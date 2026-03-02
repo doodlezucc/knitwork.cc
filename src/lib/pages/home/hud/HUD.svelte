@@ -17,7 +17,7 @@
 		margin: 8px;
 
 		display: grid;
-		place-content: center;
+		justify-self: center;
 		// grid-template-columns: max-content max-content;
 		gap: 24px;
 	}

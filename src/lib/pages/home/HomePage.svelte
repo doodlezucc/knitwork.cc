@@ -10,7 +10,7 @@
 	<div class="content">
 		<h1>Knitwork</h1>
 		<p>Hello! I make music and stuff.</p>
-		<p>The <em>Eeyore EP</em> is out now, check it out if you like.</p>
+		<p>My <em>Eeyore EP</em> is out now :)</p>
 		<p>
 			Also check out <a href="https://theoretically.online/">theoretically.online</a> for handmade development.
 		</p>
@@ -50,8 +50,7 @@
 		position: fixed;
 		top: 0;
 		left: 0;
-		width: 100vw;
-		height: 100vh; // Fallback
-		height: 100svh;
+		bottom: 0;
+		right: 0;
 	}
 </style>
