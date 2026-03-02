@@ -17,10 +17,6 @@
 	const suspensionDurationSeconds = 5;
 	const suspensionEasing = cubicOut;
 
-	const grabMaxDelayMs = 40;
-	const clickMaxDelayMs = 150;
-	const tapImpulse = 0.08;
-
 	const { rigidBodyA: bodyCD, rigidBodyB: bodyHook } = useRopeJoint([0, 0, 0], [0, 0, 0], 4);
 
 	let isSuspending = $state(false);
@@ -57,7 +53,7 @@
 				cdAnchorPosition.copy($bodyCD.translation());
 				ropeEndpoints = [hookPosition, cdAnchorPosition];
 
-				const cdIntersection = intersectCD();
+				const cdIntersection = computeCDIntersection();
 				isHovered = cdIntersection !== undefined;
 			}
 		},
@@ -92,7 +88,7 @@
 
 	let cdHitbox: Object3D | undefined;
 
-	function intersectCD() {
+	function computeCDIntersection() {
 		if (!cdHitbox) return undefined;
 
 		return raycaster.intersect(cdHitbox);
@@ -114,7 +110,7 @@
 
 		if (!$bodyCD || !$bodyCursor) return;
 
-		const intersection = intersectCD();
+		const intersection = computeCDIntersection();
 		if (!intersection) return;
 
 		const grabbedPoint = intersection.point;
@@ -149,16 +145,12 @@
 	function onTouchStart(ev: TouchEvent) {
 		raycaster.handlePointerPositionUpdate(ev.touches[0]);
 
-		if (intersectCD()) {
+		if (computeCDIntersection()) {
 			ev.preventDefault();
 		}
 	}
 
 	const { canvas } = useDOM();
-
-	let isClickEvent = false;
-	let delayedGrabbingTimeout: NodeJS.Timeout | undefined;
-	let clickCooldownTimeout: NodeJS.Timeout | undefined;
 
 	function onPointerDown(ev: PointerEvent) {
 		if (ev.target !== canvas) {
@@ -170,17 +162,11 @@
 
 		raycaster.handlePointerPositionUpdate(ev);
 
-		const cdIntersection = intersectCD();
+		const cdIntersection = computeCDIntersection();
 
 		if (cdIntersection) {
 			ev.preventDefault();
-			isClickEvent = true;
-
-			clearTimeout(delayedGrabbingTimeout);
-			delayedGrabbingTimeout = setTimeout(() => startGrabbing(ev.pointerId), grabMaxDelayMs);
-
-			clearTimeout(clickCooldownTimeout);
-			clickCooldownTimeout = setTimeout(() => (isClickEvent = false), clickMaxDelayMs);
+			startGrabbing(ev.pointerId);
 		}
 	}
 
@@ -188,7 +174,6 @@
 		raycaster.handlePointerPositionUpdate(ev);
 
 		if (grabbingState && ev.pointerId === grabbingState.pointerId) {
-			isClickEvent = false;
 			const grabbedPoint = raycaster.raycastPlaneXY(grabbingState.zCoordinate);
 			$bodyCursor!.setNextKinematicTranslation(grabbedPoint);
 		}
@@ -197,21 +182,11 @@
 	function onPointerUp(ev: PointerEvent) {
 		if (grabbingState && ev.pointerId === grabbingState.pointerId) {
 			disposeGrabbingState();
-
-			if (isClickEvent) {
-				applyImpulse();
-			}
 		}
 	}
 
-	function applyImpulse() {
-		const cdIntersection = intersectCD();
-		if (!cdIntersection || !$bodyCD) return;
-
-		$bodyCD.applyImpulseAtPoint(new Vector3(0, 0, -tapImpulse), cdIntersection.point, true);
-	}
-
 	onMount(() => {
+		// { passive: false } is needed here to correctly intercept mobile scroll events.
 		document.addEventListener('touchstart', onTouchStart, { passive: false });
 
 		return () => {
