@@ -8,9 +8,10 @@
 
 	interface Props {
 		target: Vector3Like | undefined;
+		enableFadeOutDelay: boolean;
 	}
 
-	let { target }: Props = $props();
+	let { target, enableFadeOutDelay }: Props = $props();
 
 	const validTarget = new Vector3();
 
@@ -22,7 +23,7 @@
 			animation.set(0, { duration: 0 });
 			animation.set(1);
 		} else {
-			animation.set(0, { delay: 100 });
+			animation.set(0, { delay: enableFadeOutDelay ? 100 : 0 });
 		}
 	});
 </script>

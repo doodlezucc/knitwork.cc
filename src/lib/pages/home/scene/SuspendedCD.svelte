@@ -90,6 +90,7 @@
 		anchorRelativeToCDModel: Vector3;
 	}
 
+	let isTouchEvent = $state(false);
 	let grabbingState = $state<GrabbingState>();
 	const bodyCursor = writable<RapierRigidBody | undefined>();
 
@@ -175,6 +176,7 @@
 
 		if (cdIntersection) {
 			ev.preventDefault();
+			isTouchEvent = ev.pointerType === 'touch';
 			startGrabbing(ev.pointerId);
 		}
 	}
@@ -228,7 +230,10 @@
 			<Collider shape="cuboid" args={[0.5, 0.04, 0.417]} />
 			<EeyoreCD onLoaded={startSuspension} bind:ref={cdModel}>
 				{#snippet hullMaterial()}
-					<ProximityShaderMaterial target={grabbingState?.anchorRelativeToCDModel} />
+					<ProximityShaderMaterial
+						target={grabbingState?.anchorRelativeToCDModel}
+						enableFadeOutDelay={isTouchEvent}
+					/>
 				{/snippet}
 			</EeyoreCD>
 
