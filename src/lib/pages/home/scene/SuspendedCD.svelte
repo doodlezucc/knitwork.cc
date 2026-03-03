@@ -1,6 +1,6 @@
 <script lang="ts">
 	import EeyoreCD from '$lib/assets/gltf/EeyoreCD.svelte';
-	import {
+	import type {
 		ImpulseJoint,
 		Quaternion as RapierQuaternion,
 		RigidBody as RapierRigidBody
