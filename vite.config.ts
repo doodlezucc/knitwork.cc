@@ -7,10 +7,12 @@ export default defineConfig({
 		include: [
 			'@dimforge/rapier3d-compat',
 			'@iconify-svelte/lucide/x',
+			'@monogrid/gainmap-js',
 			'@threlte/core',
 			'@threlte/extras',
 			'@threlte/rapier',
-			'three'
+			'three',
+			'three/examples/jsm/Addons.js'
 		]
 	},
 	test: {
