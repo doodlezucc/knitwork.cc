@@ -6,6 +6,7 @@ export default defineConfig({
 	optimizeDeps: {
 		include: [
 			'@dimforge/rapier3d-compat',
+			'@iconify-svelte/lucide/x',
 			'@threlte/core',
 			'@threlte/extras',
 			'@threlte/rapier',

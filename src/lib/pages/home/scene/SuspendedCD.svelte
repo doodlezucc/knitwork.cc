@@ -152,15 +152,20 @@
 		};
 	}
 
+	const { canvas } = useDOM();
+
 	function onTouchStart(ev: TouchEvent) {
+		if (ev.target !== canvas) {
+			// Pointer event occurred outside the 3D scene
+			return;
+		}
+
 		raycaster.handlePointerPositionUpdate(ev.touches[0]);
 
 		if (computeCDIntersection()) {
 			ev.preventDefault();
 		}
 	}
-
-	const { canvas } = useDOM();
 
 	function onPointerDown(ev: PointerEvent) {
 		if (ev.target !== canvas) {

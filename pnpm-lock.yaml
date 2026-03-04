@@ -20,6 +20,9 @@ importers:
       '@fontsource/pt-serif':
         specifier: ^5.2.8
         version: 5.2.8
+      '@iconify-svelte/lucide':
+        specifier: ^1.0.26
+        version: 1.0.26(svelte@5.53.6)
       '@threlte/core':
         specifier: ^8.4.1
         version: 8.4.1(svelte@5.53.6)(three@0.183.2)
@@ -78,6 +81,9 @@ importers:
       svelte-check:
         specifier: ^4.4.4
         version: 4.4.4(picomatch@4.0.3)(svelte@5.53.6)(typescript@5.9.3)
+      ts-essentials:
+        specifier: ^10.1.1
+        version: 10.1.1(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -389,6 +395,17 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
+
+  '@iconify-svelte/lucide@1.0.26':
+    resolution: {integrity: sha512-UnQdgVSHZovBzjrfev2zEabw7QB2d7ATRvrqFm01RT5OiiuwwcvYLi24LU2ekIPznEv/rbsX+8WOlpGsdMCUCw==}
+
+  '@iconify/css-svelte@1.0.0':
+    resolution: {integrity: sha512-S9kZ+U/hQ+QVHZVLKu06xiVi0rII4DJCh2Z6M1m7IOyECBD7A1emk5pRx4fWG9Zp7ZOHL8dWO90sxtsaOPZBJw==}
+    peerDependencies:
+      svelte: '>4.0.0'
+
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
 
   '@img/colour@1.0.0':
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -1752,6 +1769,14 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
+  ts-essentials@10.1.1:
+    resolution: {integrity: sha512-4aTB7KLHKmUvkjNj8V+EdnmuVTiECzn3K+zIbRthumvHu+j44x3w63xpfs0JL3NGIzGXqoQ7AV591xHO+XrOTw==}
+    peerDependencies:
+      typescript: '>=4.5.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -2133,6 +2158,19 @@ snapshots:
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/retry@0.4.3': {}
+
+  '@iconify-svelte/lucide@1.0.26(svelte@5.53.6)':
+    dependencies:
+      '@iconify/css-svelte': 1.0.0(svelte@5.53.6)
+    transitivePeerDependencies:
+      - svelte
+
+  '@iconify/css-svelte@1.0.0(svelte@5.53.6)':
+    dependencies:
+      '@iconify/types': 2.0.0
+      svelte: 5.53.6
+
+  '@iconify/types@2.0.0': {}
 
   '@img/colour@1.0.0': {}
 
@@ -3434,6 +3472,10 @@ snapshots:
 
   ts-api-utils@2.4.0(typescript@5.9.3):
     dependencies:
+      typescript: 5.9.3
+
+  ts-essentials@10.1.1(typescript@5.9.3):
+    optionalDependencies:
       typescript: 5.9.3
 
   tslib@2.8.1:
