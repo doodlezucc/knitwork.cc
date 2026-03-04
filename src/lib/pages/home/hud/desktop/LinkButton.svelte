@@ -18,14 +18,20 @@
 	const simplex = new SimplexNoise();
 	let simplexT = $state(0);
 	let animationFrameHandle!: number;
+	let previousFrame!: number;
 
-	function tick(deltaMs: number) {
-		simplexT += (0.000015 * deltaMs) / 1000;
+	function tick(now: number) {
+		const deltaSeconds = (now - previousFrame) / 1000;
+		simplexT += 0.06 * deltaSeconds;
+
 		animationFrameHandle = requestAnimationFrame(tick);
+		previousFrame = now;
 	}
 
 	onMount(() => {
 		fadeInTween.set(1, { delay: Math.random() * 500 });
+
+		previousFrame = performance.now();
 		animationFrameHandle = requestAnimationFrame(tick);
 
 		return () => {
