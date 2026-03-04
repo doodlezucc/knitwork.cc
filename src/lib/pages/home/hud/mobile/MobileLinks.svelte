@@ -1,5 +1,5 @@
 <script lang="ts">
-	import BandcampLink from './links/BandcampLink.svelte';
+	import BandcampLink from '../links/BandcampLink.svelte';
 </script>
 
 <div class="list">
