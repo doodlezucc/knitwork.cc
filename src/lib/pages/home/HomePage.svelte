@@ -40,6 +40,7 @@
 
 	.content {
 		padding: 96px 24px;
+		padding-top: calc(15vh - 40px);
 		padding-bottom: 0;
 		width: min(max(calc(25vw + 200px), 640px), 100vw);
 	}

@@ -13,6 +13,8 @@ body {
 	display: flex;
 	flex-direction: column;
 	font-size: 15px;
+
+	overflow: hidden;
 }
 
 * {
@@ -34,4 +36,19 @@ a {
 em {
 	font-style: normal;
 	@include scheme.text-highlight();
+}
+
+button {
+	font: inherit;
+	border: none;
+	cursor: pointer;
+
+	text-decoration: none;
+
+	font-weight: bold;
+
+	display: grid;
+	place-content: center;
+	border-radius: 100vw;
+	box-shadow: 0 2px 4px #00000030;
 }
