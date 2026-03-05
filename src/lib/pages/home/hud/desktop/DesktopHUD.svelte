@@ -12,6 +12,8 @@
 </div>
 
 <style lang="scss">
+	@use '$lib/style/media.scss';
+
 	.hud-desktop {
 		position: absolute;
 		pointer-events: none;
@@ -27,7 +29,7 @@
 		}
 	}
 
-	@media screen and (max-width: 640px) {
+	@include media.on-mobile {
 		.hud-desktop {
 			display: none;
 		}

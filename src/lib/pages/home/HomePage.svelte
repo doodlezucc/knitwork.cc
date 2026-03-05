@@ -28,6 +28,8 @@
 </div>
 
 <style lang="scss">
+	@use '$lib/style/media.scss';
+
 	section {
 		display: grid;
 		place-content: start center;
@@ -41,7 +43,7 @@
 		width: min(max(calc(25vw + 200px), 640px), 100vw);
 	}
 
-	@media screen and (max-width: 640px) {
+	@include media.on-mobile {
 		.content {
 			padding-top: 24px;
 		}

@@ -21,6 +21,8 @@
 </div>
 
 <style lang="scss">
+	@use '$lib/style/media.scss';
+
 	.hud-mobile {
 		position: absolute;
 		z-index: 1;
@@ -56,7 +58,7 @@
 		}
 	}
 
-	@media screen and (min-width: 641px) {
+	@include media.on-desktop {
 		.hud-mobile,
 		.mobile-links {
 			display: none;

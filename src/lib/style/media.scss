@@ -1,0 +1,14 @@
+// Anything up to this width should be optimized for mobile.
+$breakpoint-width: 640px;
+
+@mixin on-mobile {
+	@media screen and (max-width: $breakpoint-width) {
+		@content;
+	}
+}
+
+@mixin on-desktop {
+	@media screen and (min-width: ($breakpoint-width + 1)) {
+		@content;
+	}
+}
