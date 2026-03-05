@@ -12,8 +12,8 @@
 <div class="list" class:visible>
 	<LinkButton platform={Platform.Spotify} />
 	<LinkButton platform={Platform.AppleMusic} />
-	<LinkButton platform={Platform.Tidal} />
 	<LinkButton platform={Platform.YouTubeMusic} />
+	<LinkButton platform={Platform.Tidal} />
 	<LinkButton platform={Platform.Bandcamp} />
 </div>
 
@@ -32,16 +32,13 @@
 		flex-wrap: wrap;
 		gap: 4px;
 
-		transition: 0.2s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+		transition: 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
 		pointer-events: none;
-		translate: 0 32px;
-		opacity: 0;
+		translate: 0 12px;
 
 		&.visible {
-			transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
 			pointer-events: all;
 			translate: 0 0;
-			opacity: 1;
 		}
 
 		> :global(*) {

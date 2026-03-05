@@ -33,7 +33,6 @@
 	}
 
 	.mobile-links {
-		pointer-events: none;
 		position: absolute;
 		z-index: 1;
 		padding: 8px 16px;
@@ -44,12 +43,16 @@
 		display: grid;
 		place-content: center;
 
+		background-color: #ffffff50;
+		backdrop-filter: blur(3px);
+
 		transition: 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+		pointer-events: none;
+		opacity: 0;
 
 		&.visible {
 			pointer-events: all;
-			background-color: #ffffff50;
-			backdrop-filter: blur(4px);
+			opacity: 1;
 		}
 	}
 

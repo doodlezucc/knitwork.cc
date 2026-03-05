@@ -9,9 +9,10 @@
 		anchor: [number, number];
 		spinAnimation?: boolean;
 		platform: Platform;
+		logoUrl?: string;
 	}
 
-	let { anchor, spinAnimation = false, platform }: Props = $props();
+	let { anchor, spinAnimation = false, platform, logoUrl }: Props = $props();
 
 	const fadeInTween = new Tween(0, { duration: 2500, easing: quintOut });
 
@@ -55,7 +56,7 @@
 	style:--tilt={simplex.noise(simplexT, 200)}
 	class:spin={spinAnimation}
 >
-	<img src={brand.logoUrl} alt="{brand.name} Logo" />
+	<img src={logoUrl ?? brand.logoUrl} alt="{brand.name} Logo" />
 
 	{brand.name}
 </a>

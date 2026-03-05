@@ -25,7 +25,7 @@
 		color: inherit;
 		text-decoration: none;
 		font-weight: normal;
-		background-color: #ffffff18;
+		background-color: #ffffff20;
 		border-radius: 12px;
 		padding: 20px 16px;
 		text-wrap: nowrap;
