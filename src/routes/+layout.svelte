@@ -3,14 +3,14 @@
 	import '@fontsource-variable/montserrat';
 	import '@fontsource/pt-serif';
 
-	import favicon from '$lib/assets/favicon.ico';
 	import '$lib/style/global.scss';
 
 	let { children } = $props();
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<meta name="og:type" content="website" />
+	<link rel="icon" href="/favicon.png" />
 </svelte:head>
 
 {@render children()}
