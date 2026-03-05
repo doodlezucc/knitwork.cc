@@ -4,11 +4,9 @@
 	import { NeutralToneMapping, PCFShadowMap } from 'three';
 	import HUD from './hud/HUD.svelte';
 	import Scene from './scene/Scene.svelte';
-
-	let isOverlayOpen = $state(false);
 </script>
 
-<section class:hide={isOverlayOpen}>
+<section>
 	<div class="content">
 		<h1>Knitwork</h1>
 		<p>Hello! I make music and stuff.</p>
@@ -19,7 +17,7 @@
 	</div>
 </section>
 
-<HUD bind:isOverlayOpen />
+<HUD />
 
 <div class="canvas">
 	<Canvas toneMapping={NeutralToneMapping} shadows={PCFShadowMap}>
@@ -33,8 +31,6 @@
 	section {
 		display: grid;
 		place-content: start center;
-		transform: translateY(0);
-		transition: transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
 		z-index: 1;
 	}
 
@@ -48,10 +44,6 @@
 	@media screen and (max-width: 640px) {
 		.content {
 			padding-top: 24px;
-		}
-
-		.hide {
-			transform: translateY(-100%);
 		}
 	}
 

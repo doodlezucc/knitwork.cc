@@ -3,12 +3,12 @@
 	import Button from '../Button.svelte';
 	import MobileLinks from './MobileLinks.svelte';
 
-	interface Props {
-		isOverlayOpen: boolean;
-	}
-
-	let { isOverlayOpen = $bindable(false) }: Props = $props();
+	let isOverlayOpen = $state(false);
 </script>
+
+<div class="mobile-links" class:visible={isOverlayOpen}>
+	<MobileLinks visible={isOverlayOpen} />
+</div>
 
 <div class="hud-mobile">
 	<Button icon={isOverlayOpen} onClick={() => (isOverlayOpen = !isOverlayOpen)}>
@@ -18,12 +18,6 @@
 			Listen
 		{/if}
 	</Button>
-
-	<div class="mobile-links">
-		{#if isOverlayOpen}
-			<MobileLinks />
-		{/if}
-	</div>
 </div>
 
 <style lang="scss">
@@ -39,13 +33,29 @@
 	}
 
 	.mobile-links {
+		pointer-events: none;
 		position: absolute;
-		bottom: 100%;
-		margin: 8px;
+		z-index: 1;
+		padding: 8px 16px;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		display: grid;
+		place-content: center;
+
+		transition: 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+
+		&.visible {
+			pointer-events: all;
+			background-color: #ffffff50;
+			backdrop-filter: blur(4px);
+		}
 	}
 
 	@media screen and (min-width: 641px) {
-		.hud-mobile {
+		.hud-mobile,
+		.mobile-links {
 			display: none;
 		}
 	}

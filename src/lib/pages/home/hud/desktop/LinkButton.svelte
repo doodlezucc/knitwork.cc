@@ -106,7 +106,6 @@
 		height: $size;
 		object-fit: contain;
 		border-radius: 4px;
-		filter: drop-shadow(0 4px 10px #00000017);
 	}
 
 	@keyframes shake {
@@ -154,15 +153,6 @@
 		}
 		100% {
 			rotate: 360deg;
-		}
-	}
-
-	@keyframes tilt {
-		0% {
-			rotate: -$tilt;
-		}
-		100% {
-			rotate: $tilt;
 		}
 	}
 </style>
