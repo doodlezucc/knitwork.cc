@@ -1,8 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { quintOut } from 'svelte/easing';
-	import { Tween } from 'svelte/motion';
-	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { Brands, EeyoreLinks, type Platform } from '../platform-links';
 
 	interface Props {
@@ -14,66 +10,62 @@
 
 	let { anchor, spinAnimation = false, platform, logoUrl }: Props = $props();
 
-	const fadeInTween = new Tween(0, { duration: 2500, easing: quintOut });
-
-	const simplex = new SimplexNoise();
-	let simplexT = $state(0);
-	let animationFrameHandle!: number;
-	let previousFrame!: number;
-
-	function tick(now: number) {
-		const deltaSeconds = (now - previousFrame) / 1000;
-		simplexT += 0.06 * deltaSeconds;
-
-		animationFrameHandle = requestAnimationFrame(tick);
-		previousFrame = now;
-	}
-
-	onMount(() => {
-		fadeInTween.set(1, { delay: Math.random() * 500 });
-
-		previousFrame = performance.now();
-		animationFrameHandle = requestAnimationFrame(tick);
-
-		return () => {
-			cancelAnimationFrame(animationFrameHandle);
-		};
-	});
-
 	let brand = $derived(Brands[platform]);
 	let href = $derived(EeyoreLinks[platform]);
+
+	function random(min: number, max: number) {
+		return min + (max - min) * Math.random();
+	}
 </script>
 
-<!-- eslint-disable svelte/no-navigation-without-resolve -->
-<a
-	{href}
-	style:--color={brand.color}
+<div
+	class="anchor"
 	style:--left={anchor[0]}
 	style:--top={anchor[1]}
-	style:--x={simplex.noise(simplexT, 0)}
-	style:--y={simplex.noise(simplexT, 100)}
-	style:--fade={fadeInTween.current}
-	style:--tilt={simplex.noise(simplexT, 200)}
-	class:spin={spinAnimation}
+	style:animation-delay="{random(0, 0.5)}s"
 >
-	<img src={logoUrl ?? brand.logoUrl} alt="{brand.name} Logo" />
+	<div class="orbiting" style:animation-delay="{random(-30, 0)}s">
+		<div class="orbiting reverse" style:animation-delay="{random(-30, 0)}s">
+			<!-- eslint-disable svelte/no-navigation-without-resolve -->
+			<a
+				{href}
+				style:--color={brand.color}
+				class:spin={spinAnimation}
+				style:animation-delay="{random(-30, 0)}s"
+			>
+				<img src={logoUrl ?? brand.logoUrl} alt="{brand.name} Logo" />
 
-	{brand.name}
-</a>
+				{brand.name}
+			</a>
+		</div>
+	</div>
+</div>
 
 <style lang="scss">
 	$size: 48px;
-	$orbit: 20px;
-	$tilt: 5deg;
+	$orbit: 8px;
+	$tilt: 2.5deg;
 
 	// Shaking intensity on hover
 	$rotation: 10deg;
 
-	a {
+	.anchor {
 		left: calc(var(--left) * 100% - $size * 0.5);
 		top: calc(var(--top) * 100% - $size * 0.5);
-		translate: calc($orbit * var(--x)) calc(100vh * (1 - var(--fade)) + $orbit * var(--y));
-		rotate: calc(calc($tilt) * var(--tilt));
+		animation: fly-in 5s cubic-bezier(0.23, 1, 0.32, 1) both;
+	}
+
+	.orbiting {
+		animation: orbit 11.3s linear infinite;
+
+		&.reverse {
+			animation-duration: 15s;
+			animation-direction: reverse;
+		}
+	}
+
+	a {
+		animation: tilt 5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
 
 		color: #000000;
 		text-decoration: none;
@@ -107,6 +99,37 @@
 		height: $size;
 		object-fit: contain;
 		border-radius: 4px;
+	}
+
+	@keyframes fly-in {
+		from {
+			transform: translateY(80vh);
+		}
+		to {
+			transform: translateY(0);
+		}
+	}
+
+	// https://lea.verou.me/blog/2012/02/moving-an-element-along-a-circle/
+	@keyframes orbit {
+		from {
+			transform: rotate(0deg) translate($orbit) rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg) translate($orbit) rotate(-360deg);
+		}
+	}
+
+	@keyframes tilt {
+		0% {
+			rotate: -$tilt;
+		}
+		50% {
+			rotate: $tilt;
+		}
+		100% {
+			rotate: -$tilt;
+		}
 	}
 
 	@keyframes shake {
