@@ -69,10 +69,10 @@
 	a {
 		animation: tilt 5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
 
-		color: #000000;
+		color: #222;
 		text-decoration: none;
-		font-weight: bold;
-		opacity: 0.65;
+		font-weight: 400;
+		opacity: 0.7;
 
 		text-align: center;
 		display: flex;
