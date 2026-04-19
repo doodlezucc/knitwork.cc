@@ -1,7 +1,7 @@
 <script lang="ts">
 	import HomePage from '$lib/pages/home/HomePage.svelte';
 
-	const title = 'Knitwork';
+	const title = 'Knitwork | Homepage';
 	const description = 'Music by Knitwork. Eeyore EP out now!';
 </script>
 
