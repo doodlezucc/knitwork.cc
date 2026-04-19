@@ -24,7 +24,7 @@
 	class="anchor"
 	style:--left={anchor[0]}
 	style:--top={anchor[1]}
-	style:animation-delay="{random(-0.5, 0.5, { seedOffset: 0 })}s"
+	style:animation-delay="{random(-0.25, 0.75, { seedOffset: 0 })}s"
 >
 	<div class="orbiting" style:animation-delay="{random(-30, 0, { seedOffset: 1 })}s">
 		<div class="orbiting reverse" style:animation-delay="{random(-30, 0, { seedOffset: 2 })}s">
@@ -54,7 +54,7 @@
 	.anchor {
 		left: calc(var(--left) * 100% - $size * 0.5);
 		top: calc(var(--top) * 100% - $size * 0.5);
-		animation: fly-in 5s cubic-bezier(0.23, 1, 0.32, 1) both;
+		animation: fly-in 3s cubic-bezier(0.23, 1, 0.32, 1) both;
 	}
 
 	.orbiting {
@@ -105,9 +105,11 @@
 
 	@keyframes fly-in {
 		from {
-			transform: translateY(100vh);
+			opacity: 0;
+			transform: translateY(50vh);
 		}
 		to {
+			opacity: 1;
 			transform: translateY(0);
 		}
 	}
