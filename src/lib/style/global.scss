@@ -34,8 +34,14 @@ h4 {
 	margin: 0;
 }
 
-a {
+// Links within a paragraph
+p a {
 	@include scheme.text-highlight();
+
+	&:hover {
+		background-color: scheme.$primary;
+		color: scheme.$background;
+	}
 }
 
 em {
