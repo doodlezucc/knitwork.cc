@@ -1,20 +1,22 @@
 <script lang="ts">
+	import { seededRandom } from 'three/src/math/MathUtils.js';
 	import { Brands, EeyoreLinks, type Platform } from '../platform-links';
 
 	interface Props {
+		randomSeed: number;
 		anchor: [number, number];
 		spinAnimation?: boolean;
 		platform: Platform;
 		logoUrl?: string;
 	}
 
-	let { anchor, spinAnimation = false, platform, logoUrl }: Props = $props();
+	let { randomSeed, anchor, spinAnimation = false, platform, logoUrl }: Props = $props();
 
 	let brand = $derived(Brands[platform]);
 	let href = $derived(EeyoreLinks[platform]);
 
-	function random(min: number, max: number) {
-		return min + (max - min) * Math.random();
+	function random(min: number, max: number, { seedOffset }: { seedOffset: number }) {
+		return min + (max - min) * seededRandom(randomSeed + seedOffset);
 	}
 </script>
 
@@ -22,16 +24,16 @@
 	class="anchor"
 	style:--left={anchor[0]}
 	style:--top={anchor[1]}
-	style:animation-delay="{random(0, 0.5)}s"
+	style:animation-delay="{random(-0.5, 0.5, { seedOffset: 0 })}s"
 >
-	<div class="orbiting" style:animation-delay="{random(-30, 0)}s">
-		<div class="orbiting reverse" style:animation-delay="{random(-30, 0)}s">
+	<div class="orbiting" style:animation-delay="{random(-30, 0, { seedOffset: 1 })}s">
+		<div class="orbiting reverse" style:animation-delay="{random(-30, 0, { seedOffset: 2 })}s">
 			<!-- eslint-disable svelte/no-navigation-without-resolve -->
 			<a
 				{href}
 				style:--color={brand.color}
 				class:spin={spinAnimation}
-				style:animation-delay="{random(-30, 0)}s"
+				style:animation-delay="{random(-30, 0, { seedOffset: 3 })}s"
 			>
 				<img src={logoUrl ?? brand.logoUrl} alt="{brand.name} Logo" />
 
@@ -103,7 +105,7 @@
 
 	@keyframes fly-in {
 		from {
-			transform: translateY(80vh);
+			transform: translateY(100vh);
 		}
 		to {
 			transform: translateY(0);

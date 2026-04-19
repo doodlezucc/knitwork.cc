@@ -12,7 +12,7 @@ export default defineConfig({
 			'@threlte/extras',
 			'@threlte/rapier',
 			'three',
-			'three/examples/jsm/Addons.js'
+			'three/src/math/MathUtils.js'
 		]
 	},
 	test: {
