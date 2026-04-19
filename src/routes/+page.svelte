@@ -12,6 +12,15 @@
 	<meta name="description" content={description} />
 	<meta name="og:description" content={description} />
 
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebSite",
+			"name": "Knitwork",
+			"url": "https://knitwork.cc/"
+		}
+	</script>
+
 	<link rel="icon" href="/favicon.png" />
 	<meta name="og:image" content="https://knitwork.cc/thumbnail-eeyore.png" />
 
