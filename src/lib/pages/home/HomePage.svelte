@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { Canvas } from '@threlte/core';
 	import { World } from '@threlte/rapier';
-	import { NeutralToneMapping, PCFShadowMap } from 'three';
 	import HUD from './hud/HUD.svelte';
+	import CustomizedCanvas from './scene/CustomizedCanvas.svelte';
 	import Scene from './scene/Scene.svelte';
 </script>
 
@@ -20,11 +19,11 @@
 <HUD />
 
 <div class="canvas">
-	<Canvas toneMapping={NeutralToneMapping} shadows={PCFShadowMap}>
+	<CustomizedCanvas>
 		<World>
 			<Scene />
 		</World>
-	</Canvas>
+	</CustomizedCanvas>
 </div>
 
 <style lang="scss">
